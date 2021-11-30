@@ -2,23 +2,25 @@ package main
 
 import (
 	"github.com/kanyuanzhi/tialloy/tinet"
+	"tialloy-demo/router"
+	"tialloy-demo/server"
 	"time"
 )
 
-var TrafficHubIns *TrafficHub
-
 func main() {
 	tcpServer := tinet.NewTcpServer()
-	tr := NewTcpRouter()
-	tcpServer.AddRouter(1, tr)
-	go tcpServer.Serve()
-
 	websocketServer := tinet.NewWebsocketServer()
-	wr := NewWebsocketRouter()
-	websocketServer.AddRouter(1, wr)
-	go websocketServer.Serve()
+	trafficHub := server.NewTrafficHub(websocketServer, tcpServer)
 
-	TrafficHubIns = NewTrafficHub()
+	tcpRouter := router.NewTcpRouter(trafficHub)
+	tcpServer.AddRouter(1, tcpRouter)
+
+	websocketRouter := router.NewWebsocketRouter(trafficHub)
+	websocketServer.AddRouter(1, websocketRouter)
+
+	go websocketServer.Serve()
+	go tcpServer.Serve()
+	go trafficHub.Start()
 
 	for {
 		time.Sleep(time.Minute)
