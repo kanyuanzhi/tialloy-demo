@@ -3,14 +3,14 @@ package main
 import (
 	"github.com/kanyuanzhi/tialloy/tinet"
 	"tialloy-demo/router"
-	"tialloy-demo/server"
+	"tialloy-demo/service"
 	"time"
 )
 
 func main() {
 	tcpServer := tinet.NewTcpServer()
 	websocketServer := tinet.NewWebsocketServer()
-	trafficHub := server.NewTrafficHub(websocketServer, tcpServer)
+	trafficHub := service.NewTrafficHub(websocketServer, tcpServer)
 
 	tcpRouter := router.NewTcpRouter(trafficHub)
 	tcpServer.AddRouter(1, tcpRouter)

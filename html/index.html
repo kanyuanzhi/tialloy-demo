@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+
+<script>
+    let ws = new WebSocket("ws://127.0.0.1:10000/touch")
+    ws.onopen = function () {
+        let msgID = 1
+        let data = ["aa", "bb", "cc", "dd", "ee"]
+        let req = {"msg_id": msgID, "data": data}
+        ws.send(JSON.stringify(req))
+    }
+    ws.onmessage = function (evt) {
+        console.log(evt.data)
+    }
+</script>
+</html>
