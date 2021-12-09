@@ -4,6 +4,8 @@ github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0U
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/kanyuanzhi/tialloy v0.1.4 h1:TNKs5y/88KiKvYKtHeBPsbploFH3GzXmdvRlHlaMEyc=
 github.com/kanyuanzhi/tialloy v0.1.4/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
+github.com/kanyuanzhi/tialloy v0.2.1 h1:XFvCO03aGt1qvJZkYB4KkX+Ac0ED98HRCOROsFw2pHA=
+github.com/kanyuanzhi/tialloy v0.2.1/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=

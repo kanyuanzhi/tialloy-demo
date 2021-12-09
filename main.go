@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/kanyuanzhi/tialloy/tinet"
-	"tialloy-demo/router"
+	"tialloy-demo/router/tcp"
+	"tialloy-demo/router/websocket"
 	"tialloy-demo/service"
-	"time"
 )
 
 func main() {
@@ -12,17 +12,20 @@ func main() {
 	websocketServer := tinet.NewWebsocketServer()
 	trafficHub := service.NewTrafficHub(websocketServer, tcpServer)
 
-	tcpRouter := router.NewTcpRouter(trafficHub)
-	tcpServer.AddRouter(1, tcpRouter)
+	tcpTerminalBasicInfoRouter := tcp.NewTerminalBasicInfoRouter(trafficHub)
+	tcpServer.AddRouter(101, tcpTerminalBasicInfoRouter)
+	trafficHub.AddSubscribeList(101)
 
-	websocketRouter := router.NewWebsocketRouter(trafficHub)
-	websocketServer.AddRouter(1, websocketRouter)
+	tcpTerminalRunningInfoRouter := tcp.NewTerminalRunningInfoRouter(trafficHub)
+	tcpServer.AddRouter(102, tcpTerminalRunningInfoRouter)
+	trafficHub.AddSubscribeList(102)
+
+	websocketBaseRouter := websocket.NewBaseRouter(trafficHub)
+	websocketServer.AddRouter(102, websocketBaseRouter)
 
 	go websocketServer.Serve()
 	go tcpServer.Serve()
 	go trafficHub.Start()
 
-	for {
-		time.Sleep(time.Minute)
-	}
+	select {}
 }

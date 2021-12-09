@@ -2,7 +2,7 @@ module tialloy-demo
 
 go 1.17
 
-require github.com/kanyuanzhi/tialloy v0.1.4
+require github.com/kanyuanzhi/tialloy v0.2.1
 
 require (
 	github.com/gorilla/websocket v1.4.2 // indirect

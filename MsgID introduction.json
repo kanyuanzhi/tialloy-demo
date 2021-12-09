@@ -1,0 +1,7 @@
+{
+  "terminal": {
+    "info": 100,
+    "basic_info": 101,
+    "running_info": 102
+  }
+}
