@@ -1,8 +1,8 @@
-package terminal
+package model
 
-type HostBasicInfo struct {
+type TerminalHostBasic struct {
 	Hostname        string `json:"hostname"`
-	BootTime        uint64 `json:"bootTime"`
+	BootTime        uint64 `json:"boot_time"`
 	OS              string `json:"os"`               // ex: freebsd, linux
 	Platform        string `json:"platform"`         // ex: ubuntu, linuxmint
 	PlatformFamily  string `json:"platform_family"`  // ex: debian, rhel
@@ -12,15 +12,15 @@ type HostBasicInfo struct {
 	User            string `json:"user"`
 }
 
-func NewHostBasicInfo() *HostBasicInfo {
-	return &HostBasicInfo{}
+func NewTerminalHostBasic() *TerminalHostBasic {
+	return &TerminalHostBasic{}
 }
 
-type HostRunningInfo struct {
+type TerminalHostRunning struct {
 	Uptime uint64 `json:"uptime"`
 	Procs  uint64 `json:"procs"` // number of processes
 }
 
-func NewHostRunningInfo() *HostRunningInfo {
-	return &HostRunningInfo{}
+func NewTerminalHostRunning() *TerminalHostRunning {
+	return &TerminalHostRunning{}
 }

@@ -1,28 +1,16 @@
-package terminal
+package model
 
-type NetInfo struct {
-	NetBasicInfo   *NetBasicInfo   `json:"net_basic_info"`
-	NetRunningInfo *NetRunningInfo `json:"net_running_info"`
-}
-
-func NewNetInfo() *NetInfo {
-	return &NetInfo{
-		NewNetBasicInfo(),
-		NewNetRunningInfo(),
-	}
-}
-
-type NetBasicInfo struct {
+type TerminalNetBasic struct {
 	Name string `json:"name"`
 	IP   string `json:"ip"`
 	Mac  string `json:"mac"`
 }
 
-func NewNetBasicInfo() *NetBasicInfo {
-	return &NetBasicInfo{}
+func NewTerminalNetBasic() *TerminalNetBasic {
+	return &TerminalNetBasic{}
 }
 
-type NetRunningInfo struct {
+type TerminalNetRunning struct {
 	BytesSent   uint64 `json:"bytes_sent"`   // number of bytes sent
 	BytesRecv   uint64 `json:"bytes_recv"`   // number of bytes received
 	PacketsSent uint64 `json:"packets_sent"` // number of packets sent
@@ -33,6 +21,6 @@ type NetRunningInfo struct {
 	Dropout     uint64 `json:"dropout"`      // total number of outgoing packets which were dropped (always 0 on OSX and BSD)
 }
 
-func NewNetRunningInfo() *NetRunningInfo {
-	return &NetRunningInfo{}
+func NewTerminalNetRunning() *TerminalNetRunning {
+	return &TerminalNetRunning{}
 }

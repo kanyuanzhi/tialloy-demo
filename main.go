@@ -12,12 +12,12 @@ func main() {
 	websocketServer := tinet.NewWebsocketServer()
 	trafficHub := service.NewTrafficHub(websocketServer, tcpServer)
 
-	tcpTerminalBasicInfoRouter := tcp.NewTerminalBasicInfoRouter(trafficHub)
-	tcpServer.AddRouter(101, tcpTerminalBasicInfoRouter)
+	tcpTerminalBasicRouter := tcp.NewTerminalBasicRouter(trafficHub)
+	tcpServer.AddRouter(101, tcpTerminalBasicRouter)
 	trafficHub.AddSubscribeList(101)
 
-	tcpTerminalRunningInfoRouter := tcp.NewTerminalRunningInfoRouter(trafficHub)
-	tcpServer.AddRouter(102, tcpTerminalRunningInfoRouter)
+	tcpTerminalRunningRouter := tcp.NewTerminalRunningRouter(trafficHub)
+	tcpServer.AddRouter(102, tcpTerminalRunningRouter)
 	trafficHub.AddSubscribeList(102)
 
 	websocketBaseRouter := websocket.NewBaseRouter(trafficHub)
@@ -25,7 +25,7 @@ func main() {
 
 	go websocketServer.Serve()
 	go tcpServer.Serve()
-	go trafficHub.Start()
+	go trafficHub.Serve()
 
 	select {}
 }

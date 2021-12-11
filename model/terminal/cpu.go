@@ -1,20 +1,20 @@
-package terminal
+package model
 
-type CpuBasicInfo struct {
+type TerminalCpuBasic struct {
 	ModelName     string `json:"model_name"`
 	PhysicalCores int    `json:"physical_cores"`
 	LogicalCores  int    `json:"logical_cores"`
 }
 
-func NewCpuBasicInfo() *CpuBasicInfo {
-	return &CpuBasicInfo{}
+func NewTerminalCpuBasic() *TerminalCpuBasic {
+	return &TerminalCpuBasic{}
 }
 
-type CpuRunningInfo struct {
+type TerminalCpuRunning struct {
 	TotalPercent []float64 `json:"total_percent"`
 	PerPercent   []float64 `json:"per_percent"`
 }
 
-func NewCpuRunningInfo() *CpuRunningInfo {
-	return &CpuRunningInfo{}
+func NewTerminalCpuRunning() *TerminalCpuRunning {
+	return &TerminalCpuRunning{}
 }

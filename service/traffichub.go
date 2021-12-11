@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/json"
 	"github.com/kanyuanzhi/tialloy/tiface"
-	"github.com/kanyuanzhi/tialloy/utils"
+	"github.com/kanyuanzhi/tialloy/tilog"
 	"sync"
 	"tialloy-demo/face"
 	"tialloy-demo/model"
@@ -32,19 +32,26 @@ func NewTrafficHub(websocketServer tiface.IServer, tcpServer tiface.IServer) fac
 }
 
 func (th *TrafficHub) Start() {
-	for {
-		select {
-		case tcpReq := <-th.TcpArrivalChan:
-			if th.MsgIDCheck(tcpReq) {
-				go th.Distribute(tcpReq)
-				go th.Save(tcpReq)
-			}
-		case wsReq := <-th.WebsocketArrivalChan:
-			if th.MsgIDCheck(wsReq) {
-				go th.Subscribe(wsReq)
+	go func() {
+		for {
+			select {
+			case tcpReq := <-th.TcpArrivalChan:
+				if th.MsgIDCheck(tcpReq) {
+					go th.Distribute(tcpReq)
+					go th.Save(tcpReq)
+				}
+			case wsReq := <-th.WebsocketArrivalChan:
+				if th.MsgIDCheck(wsReq) {
+					go th.Subscribe(wsReq)
+				}
 			}
 		}
-	}
+	}()
+}
+
+func (th *TrafficHub) Serve() {
+	th.Start()
+	select {}
 }
 
 func (th *TrafficHub) Stop() {
@@ -66,7 +73,7 @@ func (th *TrafficHub) AddSubscribeList(msgID uint32) {
 func (th *TrafficHub) Distribute(request tiface.IRequest) {
 	var tcpReqModel = model.TcpRequest{}
 	if err := json.Unmarshal(request.GetData(), &tcpReqModel); err != nil {
-		utils.GlobalLog.Error(err)
+		tilog.Log.Error(err)
 		return
 	}
 	unsubscribeWsReq := make(chan tiface.IRequest, 100) //需要取消订阅的已断开连接的websocket集合
@@ -77,7 +84,7 @@ func (th *TrafficHub) Distribute(request tiface.IRequest) {
 			go func(wsReq tiface.IRequest) {
 				err := wsReq.GetConnection().SendBuffMsg(request.GetMsgID(), request.GetData())
 				if err != nil {
-					utils.GlobalLog.Error(err)
+					tilog.Log.Error(err)
 					unsubscribeWsReq <- wsReq
 				}
 				wg.Done()
@@ -85,16 +92,16 @@ func (th *TrafficHub) Distribute(request tiface.IRequest) {
 		}
 		wg.Wait()
 		th.UnSubscribe(unsubscribeWsReq, request.GetMsgID(), tcpReqModel.Key)
-		utils.GlobalLog.Tracef("there is(are) %d websocket request(s) for msgID=%d, key=%s", len(wsReqs), request.GetMsgID(), tcpReqModel.Key)
+		tilog.Log.Tracef("there is(are) %d websocket request(s) for msgID=%d, key=%s", len(wsReqs), request.GetMsgID(), tcpReqModel.Key)
 	} else {
-		utils.GlobalLog.Tracef("there are no websocket requests for msgID=%d, key=%s", request.GetMsgID(), tcpReqModel.Key)
+		tilog.Log.Tracef("there are no websocket requests for msgID=%d, key=%s", request.GetMsgID(), tcpReqModel.Key)
 		return
 	}
 }
 
 func (th *TrafficHub) Save(request tiface.IRequest) {
-	utils.GlobalLog.Tracef("save msgID=%d", request.GetMsgID())
-	// TODO save data
+	tilog.Log.Tracef("save msgID=%d", request.GetMsgID())
+	// TODO save running data
 }
 
 func (th *TrafficHub) SubscribeOne(request tiface.IRequest, key string) {
@@ -112,7 +119,7 @@ func (th *TrafficHub) Subscribe(request tiface.IRequest) {
 	var wrd = model.WebsocketRequest{}
 	err := json.Unmarshal(request.GetData(), &wrd)
 	if err != nil {
-		utils.GlobalLog.Warn(err)
+		tilog.Log.Warn(err)
 	}
 	for _, key := range wrd.Data {
 		th.SubscribeOne(request, key)
@@ -125,12 +132,12 @@ func (th *TrafficHub) UnSubscribe(requests chan tiface.IRequest, msgID uint32, k
 	close(requests)
 	for request := range requests {
 		delete(th.SubscribeList[msgID][key], request)
-		utils.GlobalLog.Warnf("websocket request via connID=%d is removed from SubscribeList of msgID=%d, key=%s", request.GetConnection().GetConnID(), msgID, key)
+		tilog.Log.Warnf("websocket request via connID=%d is removed from SubscribeList of msgID=%d, key=%s", request.GetConnection().GetConnID(), msgID, key)
 	}
 }
 
 func (th *TrafficHub) MsgIDCheck(request tiface.IRequest) bool {
 	_, ok := th.SubscribeList[request.GetMsgID()]
-	utils.GlobalLog.Warnf("%s request msgID=%d is not added to the SubscribeList, refuse serving", request.GetConnection().GetServer().GetServerType(), request.GetMsgID())
+	tilog.Log.Warnf("%s request msgID=%d is not added to the SubscribeList, refuse serving", request.GetConnection().GetServer().GetServerType(), request.GetMsgID())
 	return ok
 }
