@@ -137,7 +137,9 @@ func (th *TrafficHub) UnSubscribe(requests chan tiface.IRequest, msgID uint32, k
 }
 
 func (th *TrafficHub) MsgIDCheck(request tiface.IRequest) bool {
-	_, ok := th.SubscribeList[request.GetMsgID()]
-	tilog.Log.Warnf("%s request msgID=%d is not added to the SubscribeList, refuse serving", request.GetConnection().GetServer().GetServerType(), request.GetMsgID())
+	var ok bool
+	if _, ok = th.SubscribeList[request.GetMsgID()]; !ok {
+		tilog.Log.Warnf("%s request msgID=%d is not added to the SubscribeList, refuse serving", request.GetConnection().GetServer().GetServerType(), request.GetMsgID())
+	}
 	return ok
 }

@@ -29,7 +29,7 @@ func (r *TerminalBasicRouter) Handle(request tiface.IRequest) {
 	terminal := model.Terminal{TerminalBasic: terminalBasic}
 	key := terminalBasicPack.Key
 	var total int64
-	global.DB.Where("net_mac = ?", key).Find(&terminal).Count(&total)
+	global.DB.Model(&terminal).Where("net_mac = ?", key).Count(&total)
 	// 查询数据库中是否存在key的记录
 	if total == 0 {
 		// 没有则添加
@@ -40,6 +40,7 @@ func (r *TerminalBasicRouter) Handle(request tiface.IRequest) {
 		}
 		tilog.Log.Infof("terminal mac=%s has been created", key)
 	} else {
-		tilog.Log.Infof("terminal mac=%s repeats", key)
+		global.DB.Model(&terminal).Where("net_mac = ?", key).Updates(&terminal)
+		tilog.Log.Infof("terminal mac=%s has been updated", key)
 	}
 }
