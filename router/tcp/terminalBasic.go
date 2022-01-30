@@ -19,6 +19,10 @@ func NewTerminalBasicRouter(trafficHub face.ITrafficHub) tiface.IRouter {
 	}
 }
 
+func (r *TerminalBasicRouter) PreHandle(request tiface.IRequest) {
+	r.TrafficHub.SetTcpConnList(request)
+}
+
 func (r *TerminalBasicRouter) Handle(request tiface.IRequest) {
 	var terminalBasicPack = model.TerminalBasicPack{}
 	if err := json.Unmarshal(request.GetData(), &terminalBasicPack); err != nil {

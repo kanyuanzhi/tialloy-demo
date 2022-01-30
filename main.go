@@ -20,8 +20,19 @@ func main() {
 	tcpServer.AddRouter(102, tcpTerminalRunningRouter)
 	trafficHub.AddSubscribeList(102)
 
-	websocketBaseRouter := websocket.NewBaseRouter(trafficHub)
-	websocketServer.AddRouter(102, websocketBaseRouter)
+	tcpCommandExexResultRouter := tcp.NewBaseTcpRouter(trafficHub)
+	tcpServer.AddRouter(110, tcpCommandExexResultRouter)
+	trafficHub.AddSubscribeList(110)
+
+	// 订阅终端运行状态
+	subscribeTerminalRouter := websocket.NewBaseWebsocketRouter(trafficHub)
+	websocketServer.AddRouter(102, subscribeTerminalRouter)
+	// 订阅命令执行情况
+	subscribeCommandRouter := websocket.NewBaseWebsocketRouter(trafficHub)
+	websocketServer.AddRouter(110, subscribeCommandRouter)
+	// 发送命令
+	sendCommandRouter := websocket.NewCommandRouter(trafficHub)
+	websocketServer.AddRouter(111, sendCommandRouter)
 
 	go websocketServer.Serve()
 	go tcpServer.Serve()

@@ -6,17 +6,17 @@ import (
 	"tialloy-demo/face"
 )
 
-type BaseRouter struct {
+type BaseWebsocketRouter struct {
 	*tinet.BaseRouter
 	TrafficHub face.ITrafficHub
 }
 
-func NewBaseRouter(trafficHub face.ITrafficHub) tiface.IRouter {
-	return &BaseRouter{
+func NewBaseWebsocketRouter(trafficHub face.ITrafficHub) *BaseWebsocketRouter {
+	return &BaseWebsocketRouter{
 		TrafficHub: trafficHub,
 	}
 }
 
-func (wr *BaseRouter) Handle(request tiface.IRequest) {
-	wr.TrafficHub.OnWebsocketArrive(request)
+func (bwr *BaseWebsocketRouter) Handle(request tiface.IRequest) {
+	bwr.TrafficHub.OnWebsocketArrive(request)
 }

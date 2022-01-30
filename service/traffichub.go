@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/kanyuanzhi/tialloy/tiface"
 	"github.com/kanyuanzhi/tialloy/tilog"
 	"sync"
@@ -18,6 +19,9 @@ type TrafficHub struct {
 
 	WebsocketArrivalChan chan tiface.IRequest
 	TcpArrivalChan       chan tiface.IRequest
+
+	TcpConnList        map[string]tiface.IConnection
+	CommandArrivalChan chan tiface.IRequest
 }
 
 func NewTrafficHub(websocketServer tiface.IServer, tcpServer tiface.IServer) face.ITrafficHub {
@@ -27,6 +31,9 @@ func NewTrafficHub(websocketServer tiface.IServer, tcpServer tiface.IServer) fac
 		SubscribeList:        make(map[uint32]map[string]map[tiface.IRequest]bool),
 		WebsocketArrivalChan: make(chan tiface.IRequest, 100),
 		TcpArrivalChan:       make(chan tiface.IRequest, 100),
+
+		TcpConnList:        make(map[string]tiface.IConnection),
+		CommandArrivalChan: make(chan tiface.IRequest, 100),
 	}
 	return trafficHub
 }
@@ -44,6 +51,8 @@ func (th *TrafficHub) Start() {
 				if th.MsgIDCheck(wsReq) {
 					go th.Subscribe(wsReq)
 				}
+			case commandReq := <-th.CommandArrivalChan:
+				go th.SendCommands(commandReq)
 			}
 		}
 	}()
@@ -60,6 +69,20 @@ func (th *TrafficHub) Stop() {
 
 func (th *TrafficHub) OnWebsocketArrive(request tiface.IRequest) {
 	th.WebsocketArrivalChan <- request
+}
+
+func (th *TrafficHub) OnCommandArrive(request tiface.IRequest) {
+	th.CommandArrivalChan <- request
+}
+
+func (th *TrafficHub) SetTcpConnList(request tiface.IRequest) {
+	var tcpReqModel = model.TcpRequest{}
+	if err := json.Unmarshal(request.GetData(), &tcpReqModel); err != nil {
+		tilog.Log.Error(err)
+		return
+	}
+	th.TcpConnList[tcpReqModel.Key] = request.GetConnection()
+	tilog.Log.Infoln(th.TcpConnList)
 }
 
 func (th *TrafficHub) OnTcpArrive(request tiface.IRequest) {
@@ -133,6 +156,40 @@ func (th *TrafficHub) UnSubscribe(requests chan tiface.IRequest, msgID uint32, k
 	for request := range requests {
 		delete(th.SubscribeList[msgID][key], request)
 		tilog.Log.Warnf("websocket request via connID=%d is removed from SubscribeList of msgID=%d, key=%s", request.GetConnection().GetConnID(), msgID, key)
+	}
+}
+
+func (th *TrafficHub) SendOneCommand(request tiface.IRequest, key string, command string) error {
+	tcpCommandRequest := &model.TcpCommandRequest{Command: command}
+	data, _ := json.Marshal(tcpCommandRequest)
+	if tcpConn, ok := th.TcpConnList[key]; ok {
+		err := tcpConn.SendMsg(request.GetMsgID(), data)
+		return err
+	}
+	return errors.New("offline error")
+}
+
+func (th *TrafficHub) SendCommands(request tiface.IRequest) {
+	var wcr = model.WebsocketCommandRequest{}
+	err := json.Unmarshal(request.GetData(), &wcr)
+	if err != nil {
+		tilog.Log.Warn(err)
+	}
+	unServedKeys := []string{}
+	tilog.Log.Infoln(wcr.Command)
+	for _, key := range wcr.Data {
+		if err = th.SendOneCommand(request, key, wcr.Command); err != nil {
+			unServedKeys = append(unServedKeys, key)
+		}
+	}
+	wsRes := &model.WebsocketResponse{
+		MsgID: request.GetMsgID(),
+		Data:  unServedKeys,
+	}
+	data, _ := json.Marshal(wsRes)
+	err = request.GetConnection().SendMsg(request.GetMsgID(), data)
+	if err != nil {
+		tilog.Log.Warn(err)
 	}
 }
 

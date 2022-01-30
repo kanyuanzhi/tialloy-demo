@@ -10,5 +10,8 @@ type ITrafficHub interface {
 	OnWebsocketArrive(request tiface.IRequest) //
 	OnTcpArrive(request tiface.IRequest)       //
 
+	OnCommandArrive(request tiface.IRequest)
+	SetTcpConnList(request tiface.IRequest)
+
 	AddSubscribeList(msgID uint32)
 }

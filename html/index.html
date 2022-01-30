@@ -5,20 +5,26 @@
     <title>Title</title>
 </head>
 <body>
-
+<button onclick="sendCommand()">send command</button>
 </body>
 
 <script>
     let ws = new WebSocket("ws://127.0.0.1:10000/touch")
     ws.onopen = function () {
-        let msgID = 102
-        let data = ["aa", "bb", "cc", "dd", ""]
+        let msgID = 110
+        let data = ["84:a9:38:48:d5:e6", "dd", ""]
         let req = {"msg_id": msgID, "data": data}
         ws.send(JSON.stringify(req))
     }
     ws.onmessage = function (evt) {
-        console.log(evt.data.length)
         console.log(evt.data)
+    }
+    function sendCommand() {
+        let msgID = 111
+        let command = "ping www.baidu.com"
+        let data = ["84:a9:38:48:d5:e6", "dd", ""]
+        let req = {"msg_id": msgID, "data": data, "command": command}
+        ws.send(JSON.stringify(req))
     }
 </script>
 </html>
