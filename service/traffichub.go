@@ -1,13 +1,17 @@
 package service
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"github.com/kanyuanzhi/tialloy/tiface"
-	"github.com/kanyuanzhi/tialloy/tilog"
+	"fmt"
 	"sync"
 	"tialloy-demo/face"
 	"tialloy-demo/model"
+
+	"github.com/kanyuanzhi/tialloy/tiface"
+	"github.com/kanyuanzhi/tialloy/tilog"
 )
 
 type TrafficHub struct {
@@ -86,6 +90,7 @@ func (th *TrafficHub) SetTcpConnList(request tiface.IRequest) {
 }
 
 func (th *TrafficHub) OnTcpArrive(request tiface.IRequest) {
+	tilog.Log.Tracef("OnTcpArrive")
 	th.TcpArrivalChan <- request
 }
 
@@ -94,13 +99,27 @@ func (th *TrafficHub) AddSubscribeList(msgID uint32) {
 }
 
 func (th *TrafficHub) Distribute(request tiface.IRequest) {
-	var tcpReqModel = model.TcpRequest{}
-	if err := json.Unmarshal(request.GetData(), &tcpReqModel); err != nil {
-		tilog.Log.Error(err)
-		return
+	var keyInSubscribeList string
+	msgID := request.GetMsgID()
+	if msgID == 121 {
+		cameraKeyBytes := request.GetData()[:4]
+		dataBuf := bytes.NewBuffer(cameraKeyBytes)
+		var cameraKey uint32
+		err := binary.Read(dataBuf, binary.BigEndian, &cameraKey)
+		if err != nil {
+			tilog.Log.Error(err)
+		}
+		keyInSubscribeList = fmt.Sprintf("%d", cameraKey)
+	} else {
+		var tcpReqModel = model.TcpRequest{}
+		if err := json.Unmarshal(request.GetData(), &tcpReqModel); err != nil {
+			tilog.Log.Error(err)
+			return
+		}
+		keyInSubscribeList = tcpReqModel.Key
 	}
 	unsubscribeWsReq := make(chan tiface.IRequest, 100) //需要取消订阅的已断开连接的websocket集合
-	if wsReqs, ok := th.SubscribeList[request.GetMsgID()][tcpReqModel.Key]; ok {
+	if wsReqs, ok := th.SubscribeList[request.GetMsgID()][keyInSubscribeList]; ok {
 		wg := sync.WaitGroup{}
 		wg.Add(len(wsReqs))
 		for wsReq, _ := range wsReqs {
@@ -114,10 +133,10 @@ func (th *TrafficHub) Distribute(request tiface.IRequest) {
 			}(wsReq)
 		}
 		wg.Wait()
-		th.UnSubscribe(unsubscribeWsReq, request.GetMsgID(), tcpReqModel.Key)
-		tilog.Log.Tracef("there is(are) %d websocket request(s) for msgID=%d, key=%s", len(wsReqs), request.GetMsgID(), tcpReqModel.Key)
+		th.UnSubscribe(unsubscribeWsReq, request.GetMsgID(), keyInSubscribeList)
+		tilog.Log.Tracef("there is(are) %d websocket request(s) for msgID=%d, key=%s", len(wsReqs), request.GetMsgID(), keyInSubscribeList)
 	} else {
-		tilog.Log.Tracef("there are no websocket requests for msgID=%d, key=%s", request.GetMsgID(), tcpReqModel.Key)
+		tilog.Log.Tracef("there are no websocket requests for msgID=%d, key=%s", request.GetMsgID(), keyInSubscribeList)
 		return
 	}
 }

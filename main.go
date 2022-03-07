@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/kanyuanzhi/tialloy/tinet"
 	"tialloy-demo/router/tcp"
 	"tialloy-demo/router/websocket"
 	"tialloy-demo/service"
+
+	"github.com/kanyuanzhi/tialloy/tinet"
 )
 
 func main() {
@@ -24,6 +25,10 @@ func main() {
 	tcpServer.AddRouter(110, tcpCommandExexResultRouter)
 	trafficHub.AddSubscribeList(110)
 
+	tcpImageRouter := tcp.NewBaseTcpRouter(trafficHub)
+	tcpServer.AddRouter(120, tcpImageRouter)
+	trafficHub.AddSubscribeList(120)
+
 	// 订阅终端运行状态
 	subscribeTerminalRouter := websocket.NewBaseWebsocketRouter(trafficHub)
 	websocketServer.AddRouter(102, subscribeTerminalRouter)
@@ -33,6 +38,10 @@ func main() {
 	// 发送命令
 	sendCommandRouter := websocket.NewCommandRouter(trafficHub)
 	websocketServer.AddRouter(111, sendCommandRouter)
+
+	// 订阅监控画面
+	subscribeImageRouter := websocket.NewBaseWebsocketRouter(trafficHub)
+	websocketServer.AddRouter(120, subscribeImageRouter)
 
 	go websocketServer.Serve()
 	go tcpServer.Serve()

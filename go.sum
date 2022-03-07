@@ -9,14 +9,6 @@ github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkr
 github.com/jinzhu/now v1.1.3/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
 github.com/jinzhu/now v1.1.4 h1:tHnRBy1i5F2Dh8BAFxqFzxKqqvezXrL2OW1TnX+Mlas=
 github.com/jinzhu/now v1.1.4/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
-github.com/kanyuanzhi/tialloy v0.1.4 h1:TNKs5y/88KiKvYKtHeBPsbploFH3GzXmdvRlHlaMEyc=
-github.com/kanyuanzhi/tialloy v0.1.4/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
-github.com/kanyuanzhi/tialloy v0.2.1 h1:XFvCO03aGt1qvJZkYB4KkX+Ac0ED98HRCOROsFw2pHA=
-github.com/kanyuanzhi/tialloy v0.2.1/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
-github.com/kanyuanzhi/tialloy v0.2.2 h1:nN0SMsUbkHOIIMJFRp/Ld/Me9ex/msyEkddekTapfUo=
-github.com/kanyuanzhi/tialloy v0.2.2/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
-github.com/kanyuanzhi/tialloy v1.0.0 h1:u3A4/wsU9PSV3xNRhVTBM+AzDDq9+v+XeykzgVLlnxw=
-github.com/kanyuanzhi/tialloy v1.0.0/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
 github.com/kanyuanzhi/tialloy v1.0.1 h1:zG5lJvzq0gUKKrsN48Kr6lxfyiWu0v1YyNyv+6RApEs=
 github.com/kanyuanzhi/tialloy v1.0.1/go.mod h1:FGnxdO/shXaFQECiaDpT6KqlnCsQmRin3F5bu8Qxk+A=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

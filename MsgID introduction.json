@@ -5,5 +5,8 @@
     "running_info": 102,
     "commandSubscribe": 110,
     "commandExecute": 111
+  },
+  "video":{
+    "image": 120
   }
 }
